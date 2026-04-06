@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Agent Evidence MCP</title>
+  <desc id="desc">Session-based screenshots, recordings, and review trails for long-running agent tasks.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="55%" stop-color="#0b3b5a" />
+      <stop offset="100%" stop-color="#14532d" />
+    </linearGradient>
+    <linearGradient id="panel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.14" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.06" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <circle cx="1040" cy="120" r="110" fill="#22c55e" fill-opacity="0.18" />
+  <circle cx="1030" cy="150" r="170" fill="#38bdf8" fill-opacity="0.12" />
+  <circle cx="120" cy="520" r="150" fill="#fde047" fill-opacity="0.08" />
+
+  <rect x="70" y="76" width="1060" height="478" rx="28" fill="url(#panel)" stroke="#ffffff" stroke-opacity="0.18" />
+
+  <text x="110" y="164" fill="#e2e8f0" font-size="28" font-family="Segoe UI, Arial, sans-serif" letter-spacing="2">MCP FOR LONG-RUNNING AGENT WORK</text>
+  <text x="110" y="244" fill="#ffffff" font-size="64" font-weight="700" font-family="Segoe UI, Arial, sans-serif">Agent Evidence MCP</text>
+  <text x="110" y="306" fill="#cbd5e1" font-size="30" font-family="Segoe UI, Arial, sans-serif">Turn screenshots, short recordings, and task checkpoints into a reviewable evidence trail.</text>
+
+  <rect x="110" y="360" width="260" height="82" rx="20" fill="#0b1220" fill-opacity="0.45" stroke="#67e8f9" stroke-opacity="0.5" />
+  <rect x="392" y="360" width="260" height="82" rx="20" fill="#0b1220" fill-opacity="0.45" stroke="#86efac" stroke-opacity="0.5" />
+  <rect x="674" y="360" width="260" height="82" rx="20" fill="#0b1220" fill-opacity="0.45" stroke="#facc15" stroke-opacity="0.5" />
+
+  <text x="138" y="404" fill="#67e8f9" font-size="26" font-family="Segoe UI, Arial, sans-serif">Session + Timeline</text>
+  <text x="420" y="404" fill="#86efac" font-size="26" font-family="Segoe UI, Arial, sans-serif">Checkpoint + Review</text>
+  <text x="702" y="404" fill="#fde047" font-size="26" font-family="Segoe UI, Arial, sans-serif">Shareable Artifacts</text>
+
+  <text x="112" y="500" fill="#cbd5e1" font-size="26" font-family="Segoe UI, Arial, sans-serif">Windows validated today. macOS and Linux paths included for alpha adopters.</text>
+</svg>
