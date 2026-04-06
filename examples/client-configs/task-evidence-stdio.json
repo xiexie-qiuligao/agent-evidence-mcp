@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "task-evidence": {
+      "command": "task-evidence-mcp",
+      "args": [
+        "serve",
+        "--cwd",
+        "D:\\my-project"
+      ],
+      "env": {}
+    }
+  }
+}
+

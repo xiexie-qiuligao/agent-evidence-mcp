@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "task-evidence": {
+      "command": "task-evidence-mcp",
+      "args": [
+        "serve"
+      ],
+      "env": {}
+    }
+  }
+}
+

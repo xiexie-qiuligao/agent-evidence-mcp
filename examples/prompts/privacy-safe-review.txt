@@ -1,0 +1,5 @@
+Use the task-evidence MCP server for this workflow.
+Start a session before the task begins.
+Capture checkpoints at the important screens.
+If a screenshot contains sensitive information, keep the original artifact, then create a redacted copy before presenting results back to me.
+Use the redacted artifact in the final handoff and clearly tell me which artifact is the safe shareable version.

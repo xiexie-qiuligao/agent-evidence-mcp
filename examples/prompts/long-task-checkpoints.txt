@@ -1,0 +1,6 @@
+Complete this long-running task using the task-evidence MCP server.
+Start a session named "long-task-run".
+Capture a checkpoint at the initial state, after each major state change, after each successful submit, and on every error.
+Prefer screenshots over recording unless motion matters.
+End the session and report the session directory, summary path, and key artifact paths.
+
