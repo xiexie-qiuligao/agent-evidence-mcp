@@ -1,276 +1,217 @@
-﻿# Agent Evidence MCP
+# Agent Evidence MCP
 
-Agent Evidence MCP is a lightweight MCP server for screenshots, short recordings, and milestone evidence capture during long-running agent tasks.
+[![Release](https://img.shields.io/github/v/release/xiexie-qiuligao/agent-evidence-mcp?include_prereleases&label=release)](https://github.com/xiexie-qiuligao/agent-evidence-mcp/releases)
+[![CI](https://github.com/xiexie-qiuligao/agent-evidence-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/xiexie-qiuligao/agent-evidence-mcp/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/xiexie-qiuligao/agent-evidence-mcp)](./LICENSE)
 
-The project is designed for users who want an agent to do real work on desktop or browser flows while leaving behind a clean, reviewable trail of what happened, when it happened, and where the artifacts were saved.
+中文在前，English below.
 
-## Product Goal
+## 中文
 
-Turn "take a screenshot" into a higher-level workflow:
+Agent Evidence MCP 是一个面向 agent 的轻量 MCP server。  
+它让大模型在执行长期桌面任务、浏览器任务、QA 流程、后台操作时，不只是“完成任务”，还会留下**可复盘、可审查、可分享**的证据链。
 
-- create a session for a long task
-- capture evidence at important checkpoints
-- store artifacts in a predictable directory layout
-- summarize the timeline at the end
+你可以把它理解成：
 
-## Core Experience
+- `MCP`：把本机截图、录屏、归档能力接给 agent
+- `Evidence`：把一次执行过程整理成 session、artifacts、timeline、summary
+- `Agent-first`：优先服务“长期任务中的关键节点留痕”，而不是做一个普通截图工具
 
-A good run should feel like this:
+### 它能解决什么问题
 
-1. The user asks an agent to complete a multi-step task.
-2. The agent starts an evidence session.
-3. The agent captures screenshots at key milestones and on failures.
-4. The agent stores everything under a single session directory.
-5. The agent ends with a short summary and file paths the user can open.
+- agent 做长任务时，用户看不到过程，也很难知道它做到哪一步
+- 只会“截图一下”还不够，真正需要的是关键节点证据、归档路径、任务总结
+- 有些图能直接分享，有些图含敏感信息，需要先生成一份 redacted copy
 
-## Scope
+### 核心能力
 
-### MVP
+- 会话化任务留痕：`start_session` / `end_session`
+- 关键节点截图：`capture_checkpoint`
+- 可选短录屏：`start_recording` / `stop_recording`
+- 证据增强：`attach_note` / `ocr_artifact`
+- 证据复盘：`compare_artifacts` / `compare_latest_artifacts`
+- 隐私保护：`redact_artifact`
+- 自动总结：`summary.md`、`timeline.jsonl`
 
-- screenshot-first workflow
-- session-based artifact storage
-- checkpoint metadata and timeline logging
-- companion skill to teach agents when and how to capture evidence
+### 适合的场景
 
-### Later
+- 浏览器后台配置
+- 桌面应用操作
+- QA 回归验证
+- 数据录入或运营流程
+- 需要 agent 留下“过程证据”的长期任务
 
-- short recordings for motion-heavy flows
-- OCR on screenshots
-- review-oriented artifact comparison and summaries
-- privacy-preserving redaction for sensitive screenshots
+### 一次理想流程
 
-## Repository Layout
+1. 用户让 agent 执行一个长期任务。
+2. agent 先创建一个 session。
+3. 每到关键节点截图，必要时短录屏。
+4. 如果出现错误、确认页、最终结果页，就额外留证据。
+5. 结束时返回 session 目录、summary、关键 artifact 路径。
 
-```text
-.
-|-- README.md
-|-- docs/
-|   |-- architecture.md
-|   |-- client-configs.md
-|   |-- project-spec.md
-|   |-- recipes.md
-|   `-- tasks.md
-|-- examples/
-|   |-- client-configs/
-|   `-- prompts/
-|-- skills/
-|   `-- agent-evidence-capture/
-|       `-- SKILL.md
-|-- src/
-|   `-- task_evidence_mcp/
-|       |-- __init__.py
-|       |-- cli.py
-|       |-- config.py
-|       |-- layout.py
-|       `-- server.py
-`-- tests/
-    |-- test_cli.py
-    |-- test_config.py
-    |-- test_layout.py
-    |-- test_server.py
-    `-- test_service.py
-```
+### 当前支持情况
 
-## Current Status
+| 能力 | Windows | macOS | Linux |
+| --- | --- | --- | --- |
+| Session / MCP / CLI | 已实现并本地验证 | 已实现 | 已实现 |
+| 截图 | 已实现并本地验证 | 已实现，未实机验证 | 已实现，未实机验证 |
+| 录屏 | 已实现并本地验证 | 已实现，未实机验证 | 已实现，未实机验证 |
+| Redaction | 已实现并本地验证 | 未实现 | 未实现 |
 
-The repository now includes a working screenshot-first local MVP and an MCP tool layer:
+更详细的支持矩阵见：[support-matrix.md](docs/support-matrix.md)
 
-- session creation
-- Windows full-screen screenshot capture
-- macOS screenshot backend support through the native `screencapture` path
-- Linux screenshot backend support through common desktop tools such as `gnome-screenshot`, `grim`, or `import`
-- optional short recording support via `ffmpeg`
-- platform-aware recording backend selection for Windows and macOS
-- checkpoint metadata and timeline logging
-- session summary generation with notes and OCR-ready artifact metadata
-- review-oriented artifact comparison for long-task handoff and validation
-- redacted screenshot copies for safer sharing and review
-- MCP tools for session lifecycle and artifact capture
-- a companion skill draft for long-running tasks
+### 快速开始
 
-The repository also includes client configuration examples plus basic contribution and issue-reporting assets for open-source use.
-
-Release-facing assets now also include:
-
-- a basic GitHub Actions CI workflow
-- a changelog
-- a release checklist for packaging and validation
-
-## Alpha Readiness
-
-This repository is now close to an alpha-style public release:
-
-- core CLI and MCP flows are implemented
-- Windows has real local validation for screenshot capture, redaction, and recording
-- macOS and Linux have partial cross-platform backend coverage, but not the same validation depth yet
-- packaging, tests, and build checks are in place
-
-The best current fit is an honest `alpha` release rather than a 鈥渇ully stable鈥?one.
-
-## Support Snapshot
-
-- Windows: best-supported platform today
-- macOS: screenshot and recording backends implemented, validation still needed
-- Linux: screenshot and recording backends implemented, validation still needed
-
-See the detailed matrix here: [support-matrix.md](docs/support-matrix.md)
-
-## Quickstart
-
-Install the package in editable mode from the repository root:
+安装：
 
 ```bash
 pip install -e .
 ```
 
-Optionally write a starter config:
+生成默认配置：
 
 ```bash
 agent-evidence-mcp init
 ```
 
-Recording is disabled by default. To use recording commands, enable it in `agent-evidence-mcp.toml` and point `ffmpeg_path` at a working `ffmpeg` binary if it is not already on your `PATH`.
-
-### 1. Show defaults
+查看默认配置：
 
 ```bash
 agent-evidence-mcp show-defaults
 ```
 
-### 2. Start a session
+启动一个 session：
 
 ```bash
 agent-evidence-mcp start-session "Admin QA Flow"
 ```
 
-This returns JSON including:
-
-- `session_id`
-- `session_dir`
-- `timeline_path`
-
-### 3. Capture a checkpoint
+截一个关键节点：
 
 ```bash
-agent-evidence-mcp capture-checkpoint "D:\path\to\session" "form-submitted" "The form was submitted successfully." --step step-02
+agent-evidence-mcp capture-checkpoint "D:\path\to\session" "form-submitted" "The form was submitted successfully."
 ```
 
-### 4. Capture a raw screenshot
-
-```bash
-agent-evidence-mcp capture-screenshot "D:\path\to\session" "manual-shot"
-```
-
-### 5. List artifacts
-
-```bash
-agent-evidence-mcp list-artifacts "D:\path\to\session"
-```
-
-### 6. End the session
+结束 session：
 
 ```bash
 agent-evidence-mcp end-session "D:\path\to\session"
 ```
 
-The session directory contains:
+### 典型 Artifact 目录
 
-- `session.json`
-- `timeline.jsonl`
-- `summary.md`
-- `details/`
-- `screenshots/`
-- `recordings/`
+```text
+artifacts/
+  <session_id>/
+    session.json
+    timeline.jsonl
+    summary.md
+    details/
+    screenshots/
+    recordings/
+```
 
-## Review Workflow
+### 你可以这样对 agent 说
 
-After attaching notes or OCR text, compare two artifacts from the same session:
+```text
+使用 agent-evidence MCP 帮我完成这个长期任务。
+开始前先创建一个 session。
+每到关键节点截图，错误出现时额外截图。
+优先截图，只有在动作过程很重要时才短录屏。
+结束后给我 session 目录、summary 路径和最关键的 artifact。
+```
+
+### Alpha 说明
+
+这个仓库现在适合以 **alpha** 形态公开使用：
+
+- 核心 CLI / MCP / artifact workflow 已完成
+- Windows 是当前最稳的平台
+- macOS / Linux 已有后端路径，但真实机器验证还不够充分
+- 测试、构建、release、support docs 都已经具备
+
+已知限制见：[known-limitations.md](docs/known-limitations.md)
+
+### 文档入口
+
+- 支持矩阵：[support-matrix.md](docs/support-matrix.md)
+- 已知限制：[known-limitations.md](docs/known-limitations.md)
+- 客户端配置：[client-configs.md](docs/client-configs.md)
+- Prompt recipes：[recipes.md](docs/recipes.md)
+- macOS 验证指南：[macos-validation.md](docs/macos-validation.md)
+- Linux 验证指南：[linux-validation.md](docs/linux-validation.md)
+- Alpha 发布说明草稿：[alpha-release-notes.md](docs/alpha-release-notes.md)
+- Examples 索引：[examples/README.md](examples/README.md)
+
+## English
+
+Agent Evidence MCP is a lightweight MCP server for agents that need to leave behind a **reviewable evidence trail** while performing long-running desktop or browser tasks.
+
+This project is not just about taking screenshots. It is about turning an execution run into:
+
+- a session
+- a set of artifacts
+- a timeline
+- a summary
+- a shareable handoff package
+
+### What It Does
+
+- session-based task tracking
+- milestone screenshots
+- optional short recordings
+- artifact notes and OCR enrichment
+- artifact comparison for review workflows
+- redacted screenshot copies for safer sharing
+- structured summaries and predictable artifact directories
+
+### Good Fit
+
+- browser admin flows
+- desktop operations
+- QA verification
+- troubleshooting runs
+- long-running agent tasks where users want visible checkpoints
+
+### Quickstart
+
+Install from the repo root:
 
 ```bash
-agent-evidence-mcp compare-artifacts "D:\path\to\session" "artifact-a" "artifact-b"
+pip install -e .
 ```
 
-The comparison result includes:
-
-- a `verdict` such as `unchanged`, `metadata_changed`, or `content_changed`
-- `changed_fields` so agents can see what shifted
-- `review_focus` guidance for what a human should inspect next
-- OCR previews when available
-
-Session summaries also surface lightweight review signals automatically when a session has at least two screenshots or two recordings of the same type, so `summary.md` can act as a quick handoff brief.
-
-## Privacy-Preserving Redaction
-
-Create a shareable copy of a screenshot without modifying the original artifact:
+Write a starter config:
 
 ```bash
-agent-evidence-mcp redact-artifact "D:\path\to\session" "artifact-a" "shareable-copy" --region 120,80,240,60 --region 410,90,120,40
+agent-evidence-mcp init
 ```
 
-This creates a new screenshot artifact that:
-
-- keeps the original screenshot untouched
-- records which source artifact it came from
-- stores the redaction rectangles in artifact metadata
-- surfaces the redacted copy in `summary.md` and `list_artifacts`
-
-For the common review case where you just want the latest comparable pair:
-
-```bash
-agent-evidence-mcp compare-latest-artifacts "D:\path\to\session" --artifact-type screenshot
-```
-
-If `--artifact-type` is omitted, the CLI compares the latest two artifacts of the latest artifact type in the session.
-
-## Optional Recording
-
-Recording is intentionally optional and should be used for short, motion-heavy moments rather than entire long-running tasks.
-
-Example config:
-
-```toml
-[storage]
-artifacts_dir = "artifacts"
-
-[capture]
-screenshot_format = "png"
-recording_enabled = true
-recording_format = "mp4"
-recording_frame_rate = 8
-ffmpeg_path = "ffmpeg"
-macos_avfoundation_input = "Capture screen 0:none"
-macos_capture_cursor = true
-```
-
-Start a recording:
-
-```bash
-agent-evidence-mcp start-recording "D:\path\to\session" "drag-flow" "Capture the drag and drop interaction."
-```
-
-Check whether a recording is active:
-
-```bash
-agent-evidence-mcp recording-status "D:\path\to\session"
-```
-
-Stop the recording and save it as an artifact:
-
-```bash
-agent-evidence-mcp stop-recording "D:\path\to\session"
-```
-
-On macOS, the recording backend now uses `ffmpeg` with `avfoundation`. The default input is `Capture screen 0:none`, and you can override it in config if your machine exposes a different screen capture device name.
-
-## Run As MCP
-
-Run the server over stdio:
+Start a local MCP server:
 
 ```bash
 agent-evidence-mcp serve
 ```
 
-Available MCP tools:
+Start a session:
+
+```bash
+agent-evidence-mcp start-session "Admin QA Flow"
+```
+
+Capture a checkpoint:
+
+```bash
+agent-evidence-mcp capture-checkpoint "D:\path\to\session" "form-submitted" "The form was submitted successfully."
+```
+
+End the session:
+
+```bash
+agent-evidence-mcp end-session "D:\path\to\session"
+```
+
+### Main MCP Tools
 
 - `start_session`
 - `capture_checkpoint`
@@ -286,47 +227,40 @@ Available MCP tools:
 - `compare_latest_artifacts`
 - `end_session`
 
-The server currently exposes the same core flow as the local CLI, including optional recording support when enabled in config.
+### Platform Snapshot
 
-## Examples And Client Configs
+| Capability | Windows | macOS | Linux |
+| --- | --- | --- | --- |
+| Session / MCP / CLI | Implemented and locally validated | Implemented | Implemented |
+| Screenshots | Implemented and locally validated | Implemented, not yet locally validated in this repo | Implemented, not yet locally validated in this repo |
+| Recording | Implemented and locally validated | Implemented, not yet locally validated in this repo | Implemented, not yet locally validated in this repo |
+| Redaction | Implemented and locally validated | Not implemented | Not implemented |
 
-- Prompt recipes: [recipes.md](docs/recipes.md)
-- Architecture notes: [architecture.md](docs/architecture.md)
-- Roadmap: [roadmap.md](docs/roadmap.md)
-- Release checklist: [release-checklist.md](docs/release-checklist.md)
-- Alpha release audit: [alpha-release-audit.md](docs/alpha-release-audit.md)
+### Why The Name
+
+`Agent Evidence MCP` is intentionally explicit:
+
+- `Agent` makes the intended user clear
+- `Evidence` reflects the real value: checkpoints, summaries, and review trails
+- `MCP` keeps the integration surface obvious for tool users searching GitHub
+
+### Documentation
+
 - Support matrix: [support-matrix.md](docs/support-matrix.md)
 - Known limitations: [known-limitations.md](docs/known-limitations.md)
-- Alpha release notes draft: [alpha-release-notes.md](docs/alpha-release-notes.md)
-- macOS validation guide: [macos-validation.md](docs/macos-validation.md)
-- Linux validation guide: [linux-validation.md](docs/linux-validation.md)
-- Client config notes: [client-configs.md](docs/client-configs.md)
-- Platform notes: [platform-notes.md](docs/platform-notes.md)
-- Changelog: [CHANGELOG.md](CHANGELOG.md)
-- Claude Desktop example: [claude_desktop_config.json](examples/client-configs/claude_desktop_config.json)
-- Generic stdio example: [agent-evidence-stdio.json](examples/client-configs/agent-evidence-stdio.json)
+- Client configs: [client-configs.md](docs/client-configs.md)
+- Prompt recipes: [recipes.md](docs/recipes.md)
+- Architecture: [architecture.md](docs/architecture.md)
+- Release checklist: [release-checklist.md](docs/release-checklist.md)
 - Examples index: [examples/README.md](examples/README.md)
-- Prompt snippets: [examples/prompts](examples/prompts)
-- Validation helper script: [validate_session_flow.py](scripts/validate_session_flow.py)
-- Contribution guide: [CONTRIBUTING.md](CONTRIBUTING.md)
-- License: [LICENSE](LICENSE)
 
-## Near-Term Build Order
+### Alpha Status
 
-1. Deepen review workflows around `compare_artifacts`.
-2. Keep the review path low-friction for agents and first-time users.
-3. Add more GitHub release polish as the public API stabilizes.
-4. Expand OCR and redaction features carefully around the evidence workflow.
-5. Add macOS backend work.
-6. Add Linux backend work.
+This repository is ready for honest alpha usage:
 
-## Quality Bar
+- package builds pass
+- tests pass
+- Windows validation has been run locally
+- release docs and support docs are included
 
-- simple install path
-- predictable file layout
-- low-friction first run
-- minimal dependencies
-- clear user-facing summaries
-- stable default behavior for long tasks
-
-
+If you want stronger cross-platform confidence, the next most valuable step is real macOS and Linux validation on real machines.
