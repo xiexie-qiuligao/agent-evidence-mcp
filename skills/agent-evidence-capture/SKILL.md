@@ -1,5 +1,5 @@
----
-name: task-evidence-capture
+﻿---
+name: agent-evidence-capture
 description: Capture screenshots, short recordings, and milestone evidence during long-running agent tasks. Use when Codex is asked to perform multi-step browser, desktop, QA, troubleshooting, deployment, or admin workflows where the user wants checkpoint artifacts, progress evidence, error snapshots, or a final timeline of what happened.
 ---
 
@@ -63,4 +63,6 @@ At the end of the task, report:
 - the artifact directory
 - the most important checkpoints
 - any recording paths that were created
+
+
 

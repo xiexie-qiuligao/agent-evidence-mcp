@@ -3,7 +3,7 @@ requires = ["hatchling>=1.24.0"]
 build-backend = "hatchling.build"
 
 [project]
-name = "task-evidence-mcp"
+name = "agent-evidence-mcp"
 version = "0.1.0a1"
 description = "Lightweight MCP scaffolding for screenshots, recordings, and milestone evidence capture."
 readme = "README.md"
@@ -34,7 +34,7 @@ dependencies = [
 dev = ["build>=1.2", "pytest>=8.0"]
 
 [project.scripts]
-task-evidence-mcp = "task_evidence_mcp.cli:main"
+agent-evidence-mcp = "task_evidence_mcp.cli:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

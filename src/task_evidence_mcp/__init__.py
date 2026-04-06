@@ -1,4 +1,4 @@
-"""Task Evidence MCP package."""
+"""Agent Evidence MCP package."""
 
 __all__ = ["__version__"]
 

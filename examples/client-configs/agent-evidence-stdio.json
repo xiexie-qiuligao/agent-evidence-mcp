@@ -1,7 +1,7 @@
-{
+﻿{
   "mcpServers": {
-    "task-evidence": {
-      "command": "task-evidence-mcp",
+    "agent-evidence": {
+      "command": "agent-evidence-mcp",
       "args": [
         "serve",
         "--cwd",
@@ -11,4 +11,6 @@
     }
   }
 }
+
+
 

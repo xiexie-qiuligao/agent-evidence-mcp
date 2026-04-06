@@ -1,5 +1,4 @@
-Use the task-evidence MCP server for this workflow.
+Use the agent-evidence MCP server for this workflow.
 Start a session named "motion-step-demo".
 Capture screenshots before and after the key step.
 For the animated or transient interaction, start a short recording, stop it immediately after the action, and include the recording path in the final summary.
-

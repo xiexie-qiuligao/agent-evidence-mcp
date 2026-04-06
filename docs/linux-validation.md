@@ -25,13 +25,13 @@ Confirm that the following work on a real Linux machine:
 ```bash
 pip install -e .[dev]
 python -m pytest -q
-task-evidence-mcp show-defaults
+agent-evidence-mcp show-defaults
 ```
 
 If needed, create a config:
 
 ```bash
-task-evidence-mcp init
+agent-evidence-mcp init
 ```
 
 Recommended config settings:
@@ -51,7 +51,7 @@ If your desktop uses another display, update `linux_x11_display`.
 1. Start a session:
 
 ```bash
-task-evidence-mcp start-session "linux-validation"
+agent-evidence-mcp start-session "linux-validation"
 ```
 
 2. Capture a screenshot checkpoint.

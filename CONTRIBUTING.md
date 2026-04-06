@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for contributing to Task Evidence MCP.
+Thanks for contributing to Agent Evidence MCP.
 
 ## Development Flow
 

@@ -269,7 +269,7 @@ def create_mcp_server(
     config = config or AppConfig()
     service = service or TaskEvidenceService(base_dir, config)
     mcp = FastMCP(
-        name="task-evidence-mcp",
+        name="agent-evidence-mcp",
         instructions=SERVER_INSTRUCTIONS,
         dependencies=["mcp"],
     )

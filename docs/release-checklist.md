@@ -28,7 +28,7 @@ Use this checklist before publishing a new GitHub release or Python package buil
 ## Release Package
 
 - Confirm `dist/` contains both sdist and wheel artifacts.
-- Spot-check `task-evidence-mcp --help`.
+- Spot-check `agent-evidence-mcp --help`.
 - Confirm the published version number matches `pyproject.toml` and the changelog entry.
 
 ## GitHub Release

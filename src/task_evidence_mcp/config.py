@@ -57,7 +57,7 @@ class AppConfig:
         recording = "true" if self.recording_enabled else "false"
         return "\n".join(
             [
-                "# Task Evidence MCP configuration",
+                "# Agent Evidence MCP configuration",
                 "",
                 "[storage]",
                 f'artifacts_dir = "{self.artifacts_dir}"',

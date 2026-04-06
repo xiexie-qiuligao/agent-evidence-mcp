@@ -1,6 +1,6 @@
 # Architecture
 
-Task Evidence MCP is organized around a stable session-and-artifact model with swappable backends.
+Agent Evidence MCP is organized around a stable session-and-artifact model with swappable backends.
 
 ## Core Layers
 
@@ -81,4 +81,3 @@ This project is intended to grow over time:
 - artifact comparison and redaction may add more enrichment files
 
 The current structure is meant to support that growth without forcing a redesign of the CLI, MCP tools, or stored session format.
-

@@ -21,13 +21,13 @@ Confirm that the following work on a real macOS environment:
 ```bash
 pip install -e .[dev]
 python -m pytest -q
-task-evidence-mcp show-defaults
+agent-evidence-mcp show-defaults
 ```
 
 If needed, create a config:
 
 ```bash
-task-evidence-mcp init
+agent-evidence-mcp init
 ```
 
 Recommended config settings:
@@ -47,7 +47,7 @@ If the default input does not work, list devices with ffmpeg and update `macos_a
 1. Start a session:
 
 ```bash
-task-evidence-mcp start-session "macos-validation"
+agent-evidence-mcp start-session "macos-validation"
 ```
 
 2. Capture a screenshot checkpoint.

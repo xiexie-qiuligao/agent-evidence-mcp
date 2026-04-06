@@ -1,13 +1,13 @@
 # Client Configs
 
-This document collects practical MCP client configuration examples for Task Evidence MCP.
+This document collects practical MCP client configuration examples for Agent Evidence MCP.
 
 ## What This Server Exposes
 
 The server runs locally and is intended to be launched over `stdio`:
 
 ```bash
-task-evidence-mcp serve
+agent-evidence-mcp serve
 ```
 
 Available tools:
@@ -35,8 +35,8 @@ Example:
 ```json
 {
   "mcpServers": {
-    "task-evidence": {
-      "command": "task-evidence-mcp",
+    "agent-evidence": {
+      "command": "agent-evidence-mcp",
       "args": ["serve"],
       "env": {}
     }
@@ -49,8 +49,8 @@ If you want the server to use a specific project directory:
 ```json
 {
   "mcpServers": {
-    "task-evidence": {
-      "command": "task-evidence-mcp",
+    "agent-evidence": {
+      "command": "agent-evidence-mcp",
       "args": ["serve", "--cwd", "D:\\\\my-project"],
       "env": {}
     }
@@ -63,14 +63,14 @@ If you use a custom config file:
 ```json
 {
   "mcpServers": {
-    "task-evidence": {
-      "command": "task-evidence-mcp",
+    "agent-evidence": {
+      "command": "agent-evidence-mcp",
       "args": [
         "serve",
         "--cwd",
         "D:\\\\my-project",
         "--config",
-        "D:\\\\my-project\\\\task-evidence-mcp.toml"
+        "D:\\\\my-project\\\\agent-evidence-mcp.toml"
       ],
       "env": {}
     }
@@ -89,8 +89,8 @@ Many MCP clients use a closely related JSON structure for local stdio servers. I
 ```json
 {
   "mcpServers": {
-    "task-evidence": {
-      "command": "task-evidence-mcp",
+    "agent-evidence": {
+      "command": "agent-evidence-mcp",
       "args": ["serve"],
       "env": {}
     }
@@ -107,7 +107,7 @@ This generic pattern is an inference from common local stdio MCP client layouts.
 After connecting the server, give the agent a short operating instruction:
 
 ```text
-Use the task-evidence MCP server for long-running UI or desktop work.
+Use the agent-evidence MCP server for long-running UI or desktop work.
 Start a session before the task, capture checkpoints at major state changes,
 prefer screenshots over recording, and end the session with artifact paths.
 ```

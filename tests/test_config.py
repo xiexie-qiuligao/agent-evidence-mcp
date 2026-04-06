@@ -29,7 +29,7 @@ def test_resolve_artifacts_dir_is_based_on_given_directory() -> None:
 
 
 def test_load_config_reads_toml_values(tmp_path: Path) -> None:
-    config_path = tmp_path / "task-evidence-mcp.toml"
+    config_path = tmp_path / "agent-evidence-mcp.toml"
     config_path.write_text(
         "\n".join(
             [

@@ -1,6 +1,6 @@
-# Task Evidence MCP
+﻿# Agent Evidence MCP
 
-Task Evidence MCP is a lightweight MCP server for screenshots, short recordings, and milestone evidence capture during long-running agent tasks.
+Agent Evidence MCP is a lightweight MCP server for screenshots, short recordings, and milestone evidence capture during long-running agent tasks.
 
 The project is designed for users who want an agent to do real work on desktop or browser flows while leaving behind a clean, reviewable trail of what happened, when it happened, and where the artifacts were saved.
 
@@ -54,7 +54,7 @@ A good run should feel like this:
 |   |-- client-configs/
 |   `-- prompts/
 |-- skills/
-|   `-- task-evidence-capture/
+|   `-- agent-evidence-capture/
 |       `-- SKILL.md
 |-- src/
 |   `-- task_evidence_mcp/
@@ -105,13 +105,13 @@ This repository is now close to an alpha-style public release:
 - macOS and Linux have partial cross-platform backend coverage, but not the same validation depth yet
 - packaging, tests, and build checks are in place
 
-The best current fit is an honest `alpha` release rather than a “fully stable” one.
+The best current fit is an honest `alpha` release rather than a 鈥渇ully stable鈥?one.
 
 ## Support Snapshot
 
 - Windows: best-supported platform today
 - macOS: screenshot and recording backends implemented, validation still needed
-- Linux: screenshot backend implemented, recording still pending
+- Linux: screenshot and recording backends implemented, validation still needed
 
 See the detailed matrix here: [support-matrix.md](docs/support-matrix.md)
 
@@ -126,21 +126,21 @@ pip install -e .
 Optionally write a starter config:
 
 ```bash
-task-evidence-mcp init
+agent-evidence-mcp init
 ```
 
-Recording is disabled by default. To use recording commands, enable it in `task-evidence-mcp.toml` and point `ffmpeg_path` at a working `ffmpeg` binary if it is not already on your `PATH`.
+Recording is disabled by default. To use recording commands, enable it in `agent-evidence-mcp.toml` and point `ffmpeg_path` at a working `ffmpeg` binary if it is not already on your `PATH`.
 
 ### 1. Show defaults
 
 ```bash
-task-evidence-mcp show-defaults
+agent-evidence-mcp show-defaults
 ```
 
 ### 2. Start a session
 
 ```bash
-task-evidence-mcp start-session "Admin QA Flow"
+agent-evidence-mcp start-session "Admin QA Flow"
 ```
 
 This returns JSON including:
@@ -152,25 +152,25 @@ This returns JSON including:
 ### 3. Capture a checkpoint
 
 ```bash
-task-evidence-mcp capture-checkpoint "D:\path\to\session" "form-submitted" "The form was submitted successfully." --step step-02
+agent-evidence-mcp capture-checkpoint "D:\path\to\session" "form-submitted" "The form was submitted successfully." --step step-02
 ```
 
 ### 4. Capture a raw screenshot
 
 ```bash
-task-evidence-mcp capture-screenshot "D:\path\to\session" "manual-shot"
+agent-evidence-mcp capture-screenshot "D:\path\to\session" "manual-shot"
 ```
 
 ### 5. List artifacts
 
 ```bash
-task-evidence-mcp list-artifacts "D:\path\to\session"
+agent-evidence-mcp list-artifacts "D:\path\to\session"
 ```
 
 ### 6. End the session
 
 ```bash
-task-evidence-mcp end-session "D:\path\to\session"
+agent-evidence-mcp end-session "D:\path\to\session"
 ```
 
 The session directory contains:
@@ -187,7 +187,7 @@ The session directory contains:
 After attaching notes or OCR text, compare two artifacts from the same session:
 
 ```bash
-task-evidence-mcp compare-artifacts "D:\path\to\session" "artifact-a" "artifact-b"
+agent-evidence-mcp compare-artifacts "D:\path\to\session" "artifact-a" "artifact-b"
 ```
 
 The comparison result includes:
@@ -204,7 +204,7 @@ Session summaries also surface lightweight review signals automatically when a s
 Create a shareable copy of a screenshot without modifying the original artifact:
 
 ```bash
-task-evidence-mcp redact-artifact "D:\path\to\session" "artifact-a" "shareable-copy" --region 120,80,240,60 --region 410,90,120,40
+agent-evidence-mcp redact-artifact "D:\path\to\session" "artifact-a" "shareable-copy" --region 120,80,240,60 --region 410,90,120,40
 ```
 
 This creates a new screenshot artifact that:
@@ -217,7 +217,7 @@ This creates a new screenshot artifact that:
 For the common review case where you just want the latest comparable pair:
 
 ```bash
-task-evidence-mcp compare-latest-artifacts "D:\path\to\session" --artifact-type screenshot
+agent-evidence-mcp compare-latest-artifacts "D:\path\to\session" --artifact-type screenshot
 ```
 
 If `--artifact-type` is omitted, the CLI compares the latest two artifacts of the latest artifact type in the session.
@@ -245,19 +245,19 @@ macos_capture_cursor = true
 Start a recording:
 
 ```bash
-task-evidence-mcp start-recording "D:\path\to\session" "drag-flow" "Capture the drag and drop interaction."
+agent-evidence-mcp start-recording "D:\path\to\session" "drag-flow" "Capture the drag and drop interaction."
 ```
 
 Check whether a recording is active:
 
 ```bash
-task-evidence-mcp recording-status "D:\path\to\session"
+agent-evidence-mcp recording-status "D:\path\to\session"
 ```
 
 Stop the recording and save it as an artifact:
 
 ```bash
-task-evidence-mcp stop-recording "D:\path\to\session"
+agent-evidence-mcp stop-recording "D:\path\to\session"
 ```
 
 On macOS, the recording backend now uses `ffmpeg` with `avfoundation`. The default input is `Capture screen 0:none`, and you can override it in config if your machine exposes a different screen capture device name.
@@ -267,7 +267,7 @@ On macOS, the recording backend now uses `ffmpeg` with `avfoundation`. The defau
 Run the server over stdio:
 
 ```bash
-task-evidence-mcp serve
+agent-evidence-mcp serve
 ```
 
 Available MCP tools:
@@ -304,7 +304,7 @@ The server currently exposes the same core flow as the local CLI, including opti
 - Platform notes: [platform-notes.md](docs/platform-notes.md)
 - Changelog: [CHANGELOG.md](CHANGELOG.md)
 - Claude Desktop example: [claude_desktop_config.json](examples/client-configs/claude_desktop_config.json)
-- Generic stdio example: [task-evidence-stdio.json](examples/client-configs/task-evidence-stdio.json)
+- Generic stdio example: [agent-evidence-stdio.json](examples/client-configs/agent-evidence-stdio.json)
 - Examples index: [examples/README.md](examples/README.md)
 - Prompt snippets: [examples/prompts](examples/prompts)
 - Validation helper script: [validate_session_flow.py](scripts/validate_session_flow.py)
@@ -328,3 +328,5 @@ The server currently exposes the same core flow as the local CLI, including opti
 - minimal dependencies
 - clear user-facing summaries
 - stable default behavior for long tasks
+
+

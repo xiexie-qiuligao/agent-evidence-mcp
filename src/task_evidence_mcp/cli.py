@@ -15,7 +15,7 @@ from .service import TaskEvidenceService
 from .server import run_server
 from .storage import SessionNotFoundError
 
-DEFAULT_CONFIG_PATH = Path("task-evidence-mcp.toml")
+DEFAULT_CONFIG_PATH = Path("agent-evidence-mcp.toml")
 
 
 def parse_region_arg(value: str) -> dict[str, int]:
@@ -33,8 +33,8 @@ def parse_region_arg(value: str) -> dict[str, int]:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="task-evidence-mcp",
-        description="Scaffold CLI for the Task Evidence MCP project.",
+        prog="agent-evidence-mcp",
+        description="CLI for the Agent Evidence MCP project.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -74,7 +74,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--config",
         type=Path,
         default=DEFAULT_CONFIG_PATH,
-        help="Optional TOML config path. Defaults to task-evidence-mcp.toml if present.",
+        help="Optional TOML config path. Defaults to agent-evidence-mcp.toml if present.",
     )
 
     start_session_parser = subparsers.add_parser(

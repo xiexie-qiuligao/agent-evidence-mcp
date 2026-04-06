@@ -2,7 +2,7 @@
 
 ## What This Release Is
 
-Task Evidence MCP is an alpha-stage MCP server for agents that need to leave behind a reviewable artifact trail while performing long-running desktop or browser tasks.
+Agent Evidence MCP is an alpha-stage MCP server for agents that need to leave behind a reviewable artifact trail while performing long-running desktop or browser tasks.
 
 The project is aimed at workflows like:
 
@@ -36,7 +36,7 @@ The project is aimed at workflows like:
 ## Recommended First Prompt
 
 ```text
-Use the task-evidence MCP server for this long-running task.
+Use the agent-evidence MCP server for this long-running task.
 Start a session before the task, capture checkpoints at major state changes,
 prefer screenshots over recording, and end the session with artifact paths and a short review summary.
 ```

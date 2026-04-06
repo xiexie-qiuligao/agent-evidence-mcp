@@ -33,7 +33,7 @@ Result:
 
 For Windows recording, the project currently depends on `ffmpeg` with desktop capture support. The local validation in this repository used a Gyan Windows build of ffmpeg.
 
-If `ffmpeg` is not on `PATH`, set `ffmpeg_path` in `task-evidence-mcp.toml`.
+If `ffmpeg` is not on `PATH`, set `ffmpeg_path` in `agent-evidence-mcp.toml`.
 
 ## macOS
 

@@ -1,11 +1,11 @@
 # Examples
 
-This folder contains practical starting points for using Task Evidence MCP.
+This folder contains practical starting points for using Agent Evidence MCP.
 
 ## Client Configs
 
 - `client-configs/claude_desktop_config.json`
-- `client-configs/task-evidence-stdio.json`
+- `client-configs/agent-evidence-stdio.json`
 
 ## Prompt Snippets
 

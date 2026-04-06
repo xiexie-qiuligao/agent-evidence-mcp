@@ -2,7 +2,7 @@
 
 ## Summary
 
-Task Evidence MCP is an open-source MCP server that lets agents capture screenshots, short recordings, and checkpoint metadata while performing long-running desktop or browser tasks.
+Agent Evidence MCP is an open-source MCP server that lets agents capture screenshots, short recordings, and checkpoint metadata while performing long-running desktop or browser tasks.
 
 The project exists to make agent work observable, reviewable, and easy to hand off.
 

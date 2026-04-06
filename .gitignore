@@ -6,4 +6,4 @@ dist/
 build/
 artifacts/
 tools/
-task-evidence-mcp.toml
+agent-evidence-mcp.toml

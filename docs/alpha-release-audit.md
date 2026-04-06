@@ -30,7 +30,7 @@ Reason:
 
 - `python -m pytest -q`
 - `python -m build --sdist --wheel`
-- `python -m task_evidence_mcp.cli --help`
+- `agent-evidence-mcp --help`
 - Real local Windows screenshot validation
 - Real local Windows recording validation
 - Real local Windows redaction smoke flow
@@ -38,12 +38,11 @@ Reason:
 ## Remaining Risks Before Broader Adoption
 
 - macOS code paths are implemented, but this repository has not run a real local validation flow on macOS
-- Linux screenshot support depends on desktop tools that may not exist on every environment
-- Linux recording is still pending
+- Linux support remains environment-dependent and needs real machine validation
 - OCR quality and setup are backend-dependent
 
 ## Release Decision
 
 If the goal is an honest first public release, this repository is ready for an alpha publish.
 
-If the goal is stronger cross-platform confidence, the next highest-value step is real macOS validation, followed by Linux recording work.
+If the goal is stronger cross-platform confidence, the next highest-value step is real macOS validation, followed by real Linux validation.

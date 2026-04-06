@@ -1,4 +1,4 @@
-Use the task-evidence MCP server for this long-running task.
+Use the agent-evidence MCP server for this long-running task.
 Start a session, capture checkpoints at the major milestones, and only record when motion truly matters.
 When the workflow is complete, compare the latest relevant artifacts, summarize the verdict and review focus, and return:
 - the session directory
