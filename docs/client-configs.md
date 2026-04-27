@@ -13,6 +13,9 @@ agent-evidence-mcp serve
 Available tools:
 
 - `start_session`
+- `list_sessions`
+- `get_session`
+- `get_latest_session`
 - `capture_checkpoint`
 - `capture_screenshot`
 - `list_artifacts`
@@ -25,6 +28,19 @@ Available tools:
 - `compare_artifacts`
 - `compare_latest_artifacts`
 - `end_session`
+
+Available resources:
+
+- `agent-evidence://sessions`
+- `agent-evidence://latest/summary`
+- `agent-evidence://latest/artifacts`
+- `agent-evidence://sessions/{session_id}/summary`
+- `agent-evidence://sessions/{session_id}/artifacts`
+
+Available prompts:
+
+- `evidence_capture_plan`
+- `evidence_final_review`
 
 ## Claude Desktop
 

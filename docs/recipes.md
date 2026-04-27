@@ -79,7 +79,7 @@ whether the final state truly changed or only the evidence metadata changed.
 
 ```text
 Use the agent-evidence MCP server for this workflow.
-When a screenshot contains sensitive text, tokens, or personal data, keep the original artifact,
+When a screenshot contains sensitive text or personal data, keep the original artifact,
 then create a redacted copy before presenting results back to me.
 Use redact_artifact with one or more rectangular regions and clearly report which artifact is the safe shareable copy.
 Do not replace or delete the original screenshot unless I explicitly ask for that.

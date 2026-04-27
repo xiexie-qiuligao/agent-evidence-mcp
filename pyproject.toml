@@ -5,12 +5,12 @@ build-backend = "hatchling.build"
 [project]
 name = "agent-evidence-mcp"
 version = "0.1.0a1"
-description = "Lightweight MCP scaffolding for screenshots, recordings, and milestone evidence capture."
+description = "Local MCP server for capturing screenshots, recordings, and reviewable evidence from long-running agent tasks."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
-  { name = "Codex" }
+  { name = "xiexie-qiuligao" }
 ]
 keywords = ["mcp", "screenshots", "recording", "agents", "automation"]
 classifiers = [
@@ -41,3 +41,20 @@ testpaths = ["tests"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/task_evidence_mcp"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.git",
+  "/.github",
+  "/.pytest_cache",
+  "/.uv-cache",
+  "/.venv",
+  "/artifacts",
+  "/build",
+  "/dist",
+  "/tools",
+  "**/__pycache__",
+  "**/*.pyc",
+  "agent-evidence-mcp.toml",
+  "uv.lock",
+]

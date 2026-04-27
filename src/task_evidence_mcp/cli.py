@@ -86,6 +86,41 @@ def build_parser() -> argparse.ArgumentParser:
         help="Human-readable task name for the session.",
     )
 
+    list_sessions_parser = subparsers.add_parser(
+        "list-sessions",
+        help="List evidence sessions, newest first.",
+    )
+    list_sessions_parser.add_argument(
+        "--status",
+        default=None,
+        help="Optional session status filter, such as active or completed.",
+    )
+    list_sessions_parser.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="Optional maximum number of sessions to return.",
+    )
+
+    get_session_parser = subparsers.add_parser(
+        "get-session",
+        help="Load a session by session id or session directory path.",
+    )
+    get_session_parser.add_argument(
+        "session_ref",
+        help="Session id or path to the session directory.",
+    )
+
+    latest_session_parser = subparsers.add_parser(
+        "latest-session",
+        help="Return the newest evidence session.",
+    )
+    latest_session_parser.add_argument(
+        "--status",
+        default=None,
+        help="Optional session status filter, such as active or completed.",
+    )
+
     capture_parser = subparsers.add_parser(
         "capture-checkpoint",
         help="Capture a screenshot checkpoint for an existing session.",
@@ -322,6 +357,18 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "start-session":
             result = service.start_session(args.task_name)
+            print_json(result.to_dict())
+            return 0
+        if args.command == "list-sessions":
+            result = service.list_sessions(status=args.status, limit=args.limit)
+            print_json(result.to_dict())
+            return 0
+        if args.command == "get-session":
+            result = service.get_session(args.session_ref)
+            print_json(result.to_dict())
+            return 0
+        if args.command == "latest-session":
+            result = service.get_latest_session(status=args.status)
             print_json(result.to_dict())
             return 0
         if args.command == "capture-checkpoint":

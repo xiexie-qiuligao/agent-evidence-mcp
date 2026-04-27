@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from pathlib import Path
 
 from task_evidence_mcp.capture import ScreenshotBackend
@@ -80,8 +81,11 @@ def test_server_registers_expected_tools(tmp_path: Path) -> None:
         "compare_artifacts",
         "compare_latest_artifacts",
         "end_session",
+        "get_latest_session",
         "get_recording_status",
+        "get_session",
         "list_artifacts",
+        "list_sessions",
         "ocr_artifact",
         "redact_artifact",
         "start_recording",
@@ -132,6 +136,118 @@ def test_server_tools_drive_session_flow(tmp_path: Path) -> None:
     assert list_payload["artifact_count"] == 1
     assert list_payload["artifacts"][0]["label"] == "page-loaded"
     assert end_payload["status"] == "completed"
+
+
+def test_server_can_list_and_load_sessions(tmp_path: Path) -> None:
+    service = TaskEvidenceService(
+        tmp_path,
+        AppConfig(),
+        screenshot_backend=FakeScreenshotBackend(),
+    )
+    server = create_mcp_server(tmp_path, service=service)
+
+    async def main() -> tuple[dict, dict, dict]:
+        first = await server.call_tool("start_session", {"task_name": "First Server Flow"})
+        _, first_payload = first
+        second = await server.call_tool("start_session", {"task_name": "Second Server Flow"})
+        _, second_payload = second
+        await server.call_tool("end_session", {"session_dir": first_payload["session_dir"]})
+        list_result = await server.call_tool("list_sessions", {"status": "active"})
+        _, list_payload = list_result
+        get_result = await server.call_tool(
+            "get_session",
+            {"session_ref": second_payload["session_id"]},
+        )
+        _, get_payload = get_result
+        latest_result = await server.call_tool("get_latest_session", {"status": "active"})
+        _, latest_payload = latest_result
+        return list_payload, get_payload, latest_payload
+
+    list_payload, get_payload, latest_payload = asyncio.run(main())
+
+    assert list_payload["session_count"] == 1
+    assert list_payload["sessions"][0]["task_name"] == "Second Server Flow"
+    assert get_payload["task_name"] == "Second Server Flow"
+    assert latest_payload["session_id"] == get_payload["session_id"]
+
+
+def test_server_exposes_session_resources(tmp_path: Path) -> None:
+    service = TaskEvidenceService(
+        tmp_path,
+        AppConfig(),
+        screenshot_backend=FakeScreenshotBackend(),
+    )
+    server = create_mcp_server(tmp_path, service=service)
+
+    async def main() -> tuple[list[str], list[str], str, str, str]:
+        start_result = await server.call_tool("start_session", {"task_name": "Resource Server Flow"})
+        _, start_payload = start_result
+        await server.call_tool(
+            "capture_checkpoint",
+            {
+                "session_dir": start_payload["session_dir"],
+                "label": "loaded",
+                "reason": "Ready for resource reads.",
+            },
+        )
+        resources = await server.list_resources()
+        templates = await server.list_resource_templates()
+        sessions = await server.read_resource("agent-evidence://sessions")
+        summary = await server.read_resource("agent-evidence://latest/summary")
+        artifacts = await server.read_resource(
+            f"agent-evidence://sessions/{start_payload['session_id']}/artifacts"
+        )
+        return (
+            sorted(str(resource.uri) for resource in resources),
+            sorted(template.uriTemplate for template in templates),
+            sessions[0].content,
+            summary[0].content,
+            artifacts[0].content,
+        )
+
+    resource_uris, template_uris, sessions_text, summary_text, artifacts_text = asyncio.run(main())
+    sessions_payload = json.loads(sessions_text)
+    artifacts_payload = json.loads(artifacts_text)
+
+    assert "agent-evidence://sessions" in resource_uris
+    assert "agent-evidence://latest/summary" in resource_uris
+    assert "agent-evidence://sessions/{session_id}/summary" in template_uris
+    assert sessions_payload["session_count"] == 1
+    assert "Resource Server Flow" in summary_text
+    assert artifacts_payload["artifact_count"] == 1
+    assert artifacts_payload["artifacts"][0]["label"] == "loaded"
+
+
+def test_server_exposes_evidence_prompts(tmp_path: Path) -> None:
+    service = TaskEvidenceService(
+        tmp_path,
+        AppConfig(),
+        screenshot_backend=FakeScreenshotBackend(),
+    )
+    server = create_mcp_server(tmp_path, service=service)
+
+    async def main() -> tuple[list[str], str, str]:
+        prompts = await server.list_prompts()
+        capture = await server.get_prompt(
+            "evidence_capture_plan",
+            {"task_name": "QA flow"},
+        )
+        review = await server.get_prompt(
+            "evidence_final_review",
+            {"session_id": "latest"},
+        )
+        return (
+            sorted(prompt.name for prompt in prompts),
+            capture.messages[0].content.text,
+            review.messages[0].content.text,
+        )
+
+    prompt_names, capture_text, review_text = asyncio.run(main())
+
+    assert prompt_names == ["evidence_capture_plan", "evidence_final_review"]
+    assert "QA flow" in capture_text
+    assert "start_session" in capture_text
+    assert "agent-evidence://latest/summary" in review_text
 
 
 def test_server_recording_tools_drive_round_trip(tmp_path: Path) -> None:
@@ -305,7 +421,7 @@ def test_server_can_create_redacted_artifact(tmp_path: Path) -> None:
             "capture_checkpoint",
             {
                 "session_dir": start_payload["session_dir"],
-                "label": "secret-screen",
+                "label": "sensitive-screen",
                 "reason": "Contains sensitive content",
             },
         )
