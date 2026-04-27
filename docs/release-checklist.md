@@ -33,6 +33,6 @@ Use this checklist before publishing a new GitHub release or Python package buil
 
 ## GitHub Release
 
-- Summarize user-facing highlights first, then internal refactors.
+- Summarize user-facing highlights first, then implementation changes.
 - Call out platform limitations clearly, especially Windows-first capture support.
 - Include one short example of the intended long-task workflow in the release notes.

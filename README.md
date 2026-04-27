@@ -8,33 +8,40 @@
 
 ## 中文
 
-让 agent 在执行长任务时，自动留下截图、录屏、备注和总结。
+让 agent 在执行长任务时，自动留下截图、短录屏、备注和最终总结。
 
-Agent Evidence MCP 不是单纯的截图工具，它更适合这些场景：
+Agent Evidence MCP 不是普通截图软件，也不是浏览器自动化框架。它更像一个本地证据记录器：当 agent 正在操作浏览器、桌面软件、后台系统或多步骤流程时，它把关键状态保存成可复盘的任务记录。
 
-- 让 agent 操作浏览器后台、桌面软件或多步骤流程
-- 希望每到关键节点自动留图，出错时额外留证据
-- 做完后需要一个清晰的交付目录，方便自己、同事或客户复盘
+### 适合什么场景
 
-### 你装上之后能做什么
+- agent 正在执行多步骤 UI、QA、运维、配置或排障任务
+- 你希望关键节点自动留图，失败或异常时额外留证据
+- 任务结束后需要 `summary.md`、`timeline.jsonl` 和所有关键产物路径
+- 你想让同事、客户或之后的自己快速复盘 agent 做过什么
 
-- 开一个任务会话：`start_session`
-- 在关键节点截图：`capture_checkpoint`
+### 装上之后能做什么
+
+- 创建任务会话：`start_session`
+- 查看已有会话：`list_sessions` / `get_session` / `get_latest_session`
+- 保存里程碑截图：`capture_checkpoint`
 - 必要时录一小段屏幕：`start_recording` / `stop_recording`
 - 给证据加备注或 OCR 文本：`attach_note` / `ocr_artifact`
-- 对敏感区域打码，生成可分享副本：`redact_artifact`
-- 结束时自动拿到 `summary.md`、`timeline.jsonl` 和所有 artifact
+- 生成可分享的打码副本：`redact_artifact`
+- 比较最近的证据变化：`compare_artifacts` / `compare_latest_artifacts`
+- 结束时生成可交付的任务记录：`end_session`
+- 通过 MCP resources 读取最新 summary、artifact 列表和 session 索引
+- 通过 MCP prompts 获取推荐的证据采集和最终复盘提示
 
-### 最适合的使用方式
+### 推荐用法
 
-它最适合配合 agent 一起用。你不用自己手动调很多命令，通常只要告诉 agent：
+这个项目最适合配合 agent 使用。通常只需要这样告诉 agent：
 
 ```text
-用 agent-evidence MCP 帮我完成这个任务。
-开始前先创建一个 session。
-每到关键节点截一张图，出错时额外截图。
-优先截图，只有在动作过程很重要时才短录屏。
-结束后把 summary 和所有关键产物路径告诉我。
+Use agent-evidence MCP for this task.
+Start a session first.
+Capture a screenshot at each major milestone and an extra one on errors.
+Prefer screenshots over recording unless motion matters.
+When the task is done, give me the summary and the key artifact paths.
 ```
 
 ### 3 步上手
@@ -77,7 +84,7 @@ agent-evidence-mcp capture-checkpoint "D:\path\to\session" "form-submitted" "The
 agent-evidence-mcp end-session "D:\path\to\session"
 ```
 
-### 结果会保存成什么样
+### 输出结构
 
 ```text
 artifacts/
@@ -90,36 +97,27 @@ artifacts/
     recordings/
 ```
 
-你最终拿到的不是一堆散乱截图，而是一整套有时间线、有总结、可复盘的任务证据。
+最终拿到的不是一堆散乱截图，而是一套带时间线、摘要和元数据的任务证据包。
 
 ### 平台支持
 
 | 能力 | Windows | macOS | Linux |
 | --- | --- | --- | --- |
-| Session / MCP / CLI | 已实现 | 已实现 | 已实现 |
-| 截图 | 已实现并已本地验证 | 已实现 | 已实现 |
-| 录屏 | 已实现并已本地验证 | 已实现 | 已实现 |
-| Redaction | 已实现并已本地验证 | 未实现 | 未实现 |
+| Session / MCP / CLI | 已实现并本地验证 | 已实现 | 已实现 |
+| 截图 | 已实现并本地验证 | 已实现，尚未在本仓库实机验证 | 已实现，依赖本地截图工具 |
+| 录屏 | 已实现并本地验证 | 已实现，尚未在本仓库实机验证 | 已实现，依赖 X11/ffmpeg 环境 |
+| Redaction | 已实现并本地验证 | 暂未实现 | 暂未实现 |
 
-更详细的说明见：[support-matrix.md](docs/support-matrix.md)
+更详细的说明见 [support-matrix.md](docs/support-matrix.md)。
 
 ### 校验下载文件
 
-release 页面会附带 `SHA256SUMS.txt`。  
-如果你下载了 wheel 或源码包，可以这样校验：
+release 页面会附带 `SHA256SUMS.txt`。如果你下载了 wheel 或源码包，可以这样校验：
 
 ```bash
 certutil -hashfile dist\\agent_evidence_mcp-0.1.0a1-py3-none-any.whl SHA256
 certutil -hashfile dist\\agent_evidence_mcp-0.1.0a1.tar.gz SHA256
 ```
-
-### 常见使用场景
-
-- 浏览器后台配置
-- QA 回归验证
-- 桌面应用操作
-- 数据录入流程
-- 需要 agent 留下执行证据的长期任务
 
 ### 文档
 
@@ -136,16 +134,27 @@ certutil -hashfile dist\\agent_evidence_mcp-0.1.0a1.tar.gz SHA256
 
 Let your agent leave behind screenshots, short recordings, notes, and a final summary while it works through a long-running task.
 
-Agent Evidence MCP is not just a screenshot tool. It is built for workflows where an agent is doing real work and you want visible checkpoints plus a clean handoff package at the end.
+Agent Evidence MCP is not a generic screenshot app or a browser automation framework. It is a local evidence recorder for agent work: when an agent operates a browser, desktop app, admin console, or multi-step workflow, this server saves the important states as a reviewable task record.
+
+### Good Fits
+
+- multi-step UI, QA, ops, configuration, or troubleshooting tasks
+- workflows where milestone screenshots and error evidence matter
+- handoffs that need `summary.md`, `timeline.jsonl`, and artifact paths
+- reviews where another person needs to understand what the agent did
 
 ### What You Get
 
 - start a task session with `start_session`
+- inspect existing sessions with `list_sessions`, `get_session`, and `get_latest_session`
 - capture milestone screenshots with `capture_checkpoint`
 - record short screen segments when motion matters
 - attach notes or OCR text to artifacts
 - generate redacted copies for safer sharing
+- compare recent artifacts for review-oriented changes
 - finish with `summary.md`, `timeline.jsonl`, and organized artifacts
+- read the latest summary, artifact list, and session index through MCP resources
+- use MCP prompts for evidence capture and final review guidance
 
 ### Best Way To Use It
 
@@ -212,36 +221,27 @@ artifacts/
     recordings/
 ```
 
-The result is not a pile of loose screenshots. It is a reviewable task record.
+The result is not a pile of loose screenshots. It is a reviewable task evidence package with a timeline, summary, and artifact metadata.
 
 ### Platform Support
 
 | Capability | Windows | macOS | Linux |
 | --- | --- | --- | --- |
-| Session / MCP / CLI | Implemented | Implemented | Implemented |
-| Screenshots | Implemented and locally validated | Implemented | Implemented |
-| Recording | Implemented and locally validated | Implemented | Implemented |
+| Session / MCP / CLI | Implemented and locally validated | Implemented | Implemented |
+| Screenshots | Implemented and locally validated | Implemented, not locally validated in this repo | Implemented, depends on local screenshot tools |
+| Recording | Implemented and locally validated | Implemented, not locally validated in this repo | Implemented, depends on X11/ffmpeg setup |
 | Redaction | Implemented and locally validated | Not implemented | Not implemented |
 
 See [support-matrix.md](docs/support-matrix.md) for more detail.
 
 ### Verify Downloads
 
-The release includes `SHA256SUMS.txt`.  
-If you download the wheel or source archive, you can verify them like this:
+The release includes `SHA256SUMS.txt`. If you download the wheel or source archive, you can verify them like this:
 
 ```bash
 certutil -hashfile dist\\agent_evidence_mcp-0.1.0a1-py3-none-any.whl SHA256
 certutil -hashfile dist\\agent_evidence_mcp-0.1.0a1.tar.gz SHA256
 ```
-
-### Common Use Cases
-
-- browser admin flows
-- QA verification
-- desktop operations
-- data-entry workflows
-- long-running agent tasks that need visible evidence
 
 ### Docs
 

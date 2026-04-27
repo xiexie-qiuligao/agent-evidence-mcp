@@ -84,6 +84,68 @@ def test_start_session_creates_expected_files(tmp_path: Path) -> None:
     assert payload["status"] == "active"
 
 
+def test_list_sessions_returns_newest_first_and_supports_filters(tmp_path: Path) -> None:
+    service = TaskEvidenceService(
+        tmp_path,
+        AppConfig(),
+        screenshot_backend=FakeScreenshotBackend(),
+    )
+    first = service.start_session("First Flow", timestamp=datetime(2026, 4, 6, 9, 0, 0))
+    second = service.start_session("Second Flow", timestamp=datetime(2026, 4, 6, 10, 0, 0))
+    service.end_session(first.layout.session_dir)
+
+    listed = service.list_sessions()
+    active = service.list_sessions(status="active")
+    limited = service.list_sessions(limit=1)
+
+    assert [item.session.session_id for item in listed.sessions] == [
+        second.session.session_id,
+        first.session.session_id,
+    ]
+    assert [item.session.session_id for item in active.sessions] == [second.session.session_id]
+    assert limited.sessions[0].session.session_id == second.session.session_id
+
+
+def test_get_session_accepts_session_id_or_directory(tmp_path: Path) -> None:
+    service = TaskEvidenceService(
+        tmp_path,
+        AppConfig(),
+        screenshot_backend=FakeScreenshotBackend(),
+    )
+    start = service.start_session("Lookup Flow")
+
+    by_id = service.get_session(start.session.session_id)
+    by_dir = service.get_session(start.layout.session_dir)
+    latest = service.get_latest_session()
+
+    assert by_id.session.task_name == "Lookup Flow"
+    assert by_dir.session.session_id == start.session.session_id
+    assert latest.session.session_id == start.session.session_id
+    assert Path(by_id.to_dict()["summary_path"]).exists()
+
+
+def test_session_summary_and_artifact_payload_helpers(tmp_path: Path) -> None:
+    service = TaskEvidenceService(
+        tmp_path,
+        AppConfig(),
+        screenshot_backend=FakeScreenshotBackend(),
+    )
+    start = service.start_session("Resource Flow")
+    capture = service.capture_checkpoint(
+        start.layout.session_dir,
+        label="ready",
+        reason="Ready for resource inspection.",
+    )
+
+    summary = service.read_latest_session_summary()
+    payload = service.get_session_artifacts_payload(start.session.session_id)
+
+    assert "Resource Flow" in summary
+    assert payload["session_id"] == start.session.session_id
+    assert payload["artifact_count"] == 1
+    assert payload["artifacts"][0]["artifact_id"] == capture.artifact.artifact_id
+
+
 def test_capture_checkpoint_updates_timeline_and_summary(tmp_path: Path) -> None:
     service = TaskEvidenceService(
         tmp_path,
@@ -182,7 +244,7 @@ def test_redact_artifact_creates_new_redacted_screenshot(tmp_path: Path) -> None
     start = service.start_session("Redaction Flow")
     source = service.capture_checkpoint(
         start.layout.session_dir,
-        label="contains-secret",
+        label="contains-sensitive-value",
         reason="Need a safe shareable copy.",
     )
 
@@ -191,7 +253,7 @@ def test_redact_artifact_creates_new_redacted_screenshot(tmp_path: Path) -> None
         source.artifact.artifact_id,
         "safe-copy",
         [{"x": 10, "y": 20, "width": 30, "height": 40}],
-        reason="Mask the secret token before sharing.",
+        reason="Mask the sensitive value before sharing.",
         tags=["shareable"],
     )
 

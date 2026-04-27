@@ -37,7 +37,7 @@ Add features that help the project work in more real environments:
 
 - redaction hooks and shareable redacted copies
 - safer handling of sensitive UI content
-- clearer review guidance for private data
+- clearer review guidance for sensitive data
 
 ### 4. Platform Expansion
 

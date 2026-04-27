@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import json
 from pathlib import Path
 
 from mcp.server.fastmcp import Context, FastMCP
@@ -36,6 +37,27 @@ class StartSessionToolResult:
     session_dir: str
     timeline_path: str
     summary_path: str
+
+
+@dataclass
+class SessionToolResult:
+    session_id: str
+    task_name: str
+    created_at: str
+    artifacts_root: str
+    status: str
+    closed_at: str | None
+    artifact_count: int
+    metadata: dict
+    session_dir: str
+    timeline_path: str
+    summary_path: str
+
+
+@dataclass
+class ListSessionsToolResult:
+    session_count: int
+    sessions: list[SessionToolResult]
 
 
 @dataclass
@@ -154,6 +176,31 @@ def _to_start_session_tool_result(result) -> StartSessionToolResult:
         session_dir=str(result.layout.session_dir),
         timeline_path=str(result.layout.timeline_path),
         summary_path=str(result.layout.summary_path),
+    )
+
+
+def _to_session_tool_result(result) -> SessionToolResult:
+    session = result.session
+    return SessionToolResult(
+        session_id=session.session_id,
+        task_name=session.task_name,
+        created_at=session.created_at,
+        artifacts_root=session.artifacts_root,
+        status=session.status,
+        closed_at=session.closed_at,
+        artifact_count=session.artifact_count,
+        metadata=session.metadata,
+        session_dir=str(result.layout.session_dir),
+        timeline_path=str(result.layout.timeline_path),
+        summary_path=str(result.layout.summary_path),
+    )
+
+
+def _to_list_sessions_tool_result(result) -> ListSessionsToolResult:
+    sessions = [_to_session_tool_result(session) for session in result.sessions]
+    return ListSessionsToolResult(
+        session_count=len(sessions),
+        sessions=sessions,
     )
 
 
@@ -287,6 +334,127 @@ def create_mcp_server(
         await _log_info(ctx, f"Starting evidence session for {task_name}")
         result = service.start_session(task_name=task_name, metadata=metadata)
         return _to_start_session_tool_result(result)
+
+    @mcp.tool(
+        name="list_sessions",
+        description="List evidence sessions, newest first. Optionally filter by status or limit the number returned.",
+        structured_output=True,
+    )
+    async def list_sessions(
+        status: str | None = None,
+        limit: int | None = None,
+        ctx: Context | None = None,
+    ) -> ListSessionsToolResult:
+        await _log_info(ctx, "Listing evidence sessions")
+        result = service.list_sessions(status=status, limit=limit)
+        return _to_list_sessions_tool_result(result)
+
+    @mcp.tool(
+        name="get_session",
+        description="Load a session by session id or session directory path.",
+        structured_output=True,
+    )
+    async def get_session(
+        session_ref: str,
+        ctx: Context | None = None,
+    ) -> SessionToolResult:
+        await _log_info(ctx, f"Loading evidence session {session_ref}")
+        result = service.get_session(session_ref)
+        return _to_session_tool_result(result)
+
+    @mcp.tool(
+        name="get_latest_session",
+        description="Return the newest evidence session, optionally filtered by status.",
+        structured_output=True,
+    )
+    async def get_latest_session(
+        status: str | None = None,
+        ctx: Context | None = None,
+    ) -> SessionToolResult:
+        await _log_info(ctx, "Loading latest evidence session")
+        result = service.get_latest_session(status=status)
+        return _to_session_tool_result(result)
+
+    @mcp.resource(
+        "agent-evidence://sessions",
+        name="sessions",
+        description="JSON index of evidence sessions, newest first.",
+        mime_type="application/json",
+    )
+    def sessions_resource() -> str:
+        return json.dumps(service.list_sessions().to_dict(), indent=2, ensure_ascii=False)
+
+    @mcp.resource(
+        "agent-evidence://latest/summary",
+        name="latest_session_summary",
+        description="Markdown summary for the newest evidence session.",
+        mime_type="text/markdown",
+    )
+    def latest_session_summary_resource() -> str:
+        return service.read_latest_session_summary()
+
+    @mcp.resource(
+        "agent-evidence://latest/artifacts",
+        name="latest_session_artifacts",
+        description="JSON artifact list for the newest evidence session.",
+        mime_type="application/json",
+    )
+    def latest_session_artifacts_resource() -> str:
+        latest = service.get_latest_session()
+        payload = service.get_session_artifacts_payload(latest.session.session_id)
+        return json.dumps(payload, indent=2, ensure_ascii=False)
+
+    @mcp.resource(
+        "agent-evidence://sessions/{session_id}/summary",
+        name="session_summary",
+        description="Markdown summary for a session id.",
+        mime_type="text/markdown",
+    )
+    def session_summary_resource(session_id: str) -> str:
+        return service.read_session_summary(session_id)
+
+    @mcp.resource(
+        "agent-evidence://sessions/{session_id}/artifacts",
+        name="session_artifacts",
+        description="JSON artifact list for a session id.",
+        mime_type="application/json",
+    )
+    def session_artifacts_resource(session_id: str) -> str:
+        payload = service.get_session_artifacts_payload(session_id)
+        return json.dumps(payload, indent=2, ensure_ascii=False)
+
+    @mcp.prompt(
+        name="evidence_capture_plan",
+        description="Prompt an agent to use Agent Evidence MCP during a long-running task.",
+    )
+    def evidence_capture_plan(task_name: str = "the task") -> str:
+        return (
+            f"Use agent-evidence MCP while working on {task_name}.\n"
+            "Start with `start_session` and keep the returned `session_dir`.\n"
+            "Capture checkpoints at major state changes with `capture_checkpoint`.\n"
+            "Capture an extra checkpoint for errors, warnings, or unexpected UI states.\n"
+            "Prefer screenshots over recordings unless motion or timing matters.\n"
+            "Use `get_latest_session` or `list_sessions` if you need to recover session context.\n"
+            "End with `end_session`, then report the summary path and key artifact paths."
+        )
+
+    @mcp.prompt(
+        name="evidence_final_review",
+        description="Prompt an agent to review a completed evidence session before handoff.",
+    )
+    def evidence_final_review(session_id: str = "latest") -> str:
+        if session_id == "latest":
+            summary_uri = "agent-evidence://latest/summary"
+            artifacts_uri = "agent-evidence://latest/artifacts"
+        else:
+            summary_uri = f"agent-evidence://sessions/{session_id}/summary"
+            artifacts_uri = f"agent-evidence://sessions/{session_id}/artifacts"
+        return (
+            "Review the evidence session before final handoff.\n"
+            f"Read `{summary_uri}` and `{artifacts_uri}`.\n"
+            "Summarize the completed task, the most important checkpoints, any recordings, "
+            "and any residual risks or missing evidence. Include local artifact paths."
+        )
 
     @mcp.tool(
         name="capture_checkpoint",

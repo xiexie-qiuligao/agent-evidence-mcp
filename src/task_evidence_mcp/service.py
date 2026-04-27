@@ -56,6 +56,30 @@ class StartSessionResult:
 
 
 @dataclass
+class SessionLookupResult:
+    session: SessionRecord
+    layout: SessionLayout
+
+    def to_dict(self) -> dict:
+        payload = self.session.to_dict()
+        payload["session_dir"] = str(self.layout.session_dir)
+        payload["timeline_path"] = str(self.layout.timeline_path)
+        payload["summary_path"] = str(self.layout.summary_path)
+        return payload
+
+
+@dataclass
+class ListSessionsResult:
+    sessions: list[SessionLookupResult]
+
+    def to_dict(self) -> dict:
+        return {
+            "session_count": len(self.sessions),
+            "sessions": [session.to_dict() for session in self.sessions],
+        }
+
+
+@dataclass
 class CaptureCheckpointResult:
     artifact: ArtifactRecord
     session: SessionRecord
@@ -191,6 +215,68 @@ class TaskEvidenceService:
             encoding="utf-8",
         )
         return StartSessionResult(session=session, layout=layout)
+
+    def list_sessions(
+        self,
+        *,
+        status: str | None = None,
+        limit: int | None = None,
+    ) -> ListSessionsResult:
+        if limit is not None and limit <= 0:
+            raise ValueError("Session list limit must be greater than zero.")
+
+        sessions: list[SessionLookupResult] = []
+        if not self.artifacts_root.exists():
+            return ListSessionsResult(sessions=[])
+
+        for session_dir in self.artifacts_root.iterdir():
+            if not session_dir.is_dir():
+                continue
+            layout = SessionLayout.from_session_dir(session_dir.resolve())
+            if not layout.session_path.exists():
+                continue
+            session = load_session(layout.session_path)
+            if status is not None and session.status != status:
+                continue
+            sessions.append(SessionLookupResult(session=session, layout=layout))
+
+        sessions.sort(
+            key=lambda result: (result.session.created_at, result.session.session_id),
+            reverse=True,
+        )
+        if limit is not None:
+            sessions = sessions[:limit]
+        return ListSessionsResult(sessions=sessions)
+
+    def get_session(self, session_ref: str | Path) -> SessionLookupResult:
+        layout = self._resolve_session_layout(session_ref)
+        session = load_session(layout.session_path)
+        return SessionLookupResult(session=session, layout=layout)
+
+    def get_latest_session(self, *, status: str | None = None) -> SessionLookupResult:
+        sessions = self.list_sessions(status=status, limit=1).sessions
+        if not sessions:
+            qualifier = f" with status `{status}`" if status is not None else ""
+            raise SessionNotFoundError(f"No evidence sessions{qualifier} were found in {self.artifacts_root}.")
+        return sessions[0]
+
+    def read_session_summary(self, session_ref: str | Path) -> str:
+        lookup = self.get_session(session_ref)
+        if not lookup.layout.summary_path.exists():
+            raise SessionNotFoundError(f"Session summary not found: {lookup.layout.summary_path}")
+        return lookup.layout.summary_path.read_text(encoding="utf-8")
+
+    def read_latest_session_summary(self, *, status: str | None = None) -> str:
+        latest = self.get_latest_session(status=status)
+        return self.read_session_summary(latest.session.session_id)
+
+    def get_session_artifacts_payload(self, session_ref: str | Path) -> dict:
+        lookup = self.get_session(session_ref)
+        artifacts = self.list_artifacts(lookup.layout.session_dir)
+        payload = lookup.to_dict()
+        payload["artifact_count"] = len(artifacts)
+        payload["artifacts"] = [artifact.to_dict() for artifact in artifacts]
+        return payload
 
     def capture_checkpoint(
         self,
@@ -557,3 +643,16 @@ class TaskEvidenceService:
         if not normalized:
             raise RedactionError("At least one redaction region is required.")
         return normalized
+
+    def _resolve_session_layout(self, session_ref: str | Path) -> SessionLayout:
+        ref = Path(session_ref)
+        candidates: list[Path] = []
+        if ref.is_absolute() or ref.parent != Path("."):
+            candidates.append(ref)
+        candidates.append(self.artifacts_root / str(session_ref))
+
+        for candidate in candidates:
+            layout = SessionLayout.from_session_dir(candidate.resolve())
+            if layout.session_path.exists():
+                return layout
+        raise SessionNotFoundError(f"Session file not found for session reference: {session_ref}")
