@@ -48,6 +48,20 @@ When the task is done, give me the summary and the key artifact paths.
 
 1. 安装
 
+从 GitHub 安装当前版本：
+
+```bash
+pip install git+https://github.com/xiexie-qiuligao/agent-evidence-mcp.git
+```
+
+如果你安装的是已发布到 Python 包索引的版本：
+
+```bash
+pip install agent-evidence-mcp
+```
+
+如果你是开发者，已经 clone 了这个仓库：
+
 ```bash
 pip install -e .
 ```
@@ -171,6 +185,20 @@ When the task is done, give me the summary and the key artifact paths.
 ### Quick Start In 3 Steps
 
 1. Install
+
+Install the current GitHub version:
+
+```bash
+pip install git+https://github.com/xiexie-qiuligao/agent-evidence-mcp.git
+```
+
+If you are installing a published Python package:
+
+```bash
+pip install agent-evidence-mcp
+```
+
+If you are developing from a local clone:
 
 ```bash
 pip install -e .
