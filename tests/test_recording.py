@@ -119,7 +119,7 @@ def test_build_start_command_uses_linux_x11grab() -> None:
 
 
 def test_stop_recording_uses_ctrl_break_before_taskkill_when_process_object_is_missing() -> None:
-    backend = FFmpegRecordingBackend(stop_timeout_seconds=1.0)
+    backend = FFmpegRecordingBackend(stop_timeout_seconds=1.0, platform_name="win32")
     calls: list[str] = []
 
     def fake_send_ctrl_break(pid: int) -> bool:
@@ -139,7 +139,7 @@ def test_stop_recording_uses_ctrl_break_before_taskkill_when_process_object_is_m
 
 
 def test_stop_recording_falls_back_to_taskkill_after_timeout() -> None:
-    backend = FFmpegRecordingBackend(stop_timeout_seconds=1.0)
+    backend = FFmpegRecordingBackend(stop_timeout_seconds=1.0, platform_name="win32")
     process = TimeoutFakeProcess()
     backend._processes[4321] = process
     calls: list[str] = []
