@@ -17,6 +17,16 @@
 
 ### 怎么开始用
 
+从 GitHub 安装当前版本：
+
+```bash
+pip install git+https://github.com/xiexie-qiuligao/agent-evidence-mcp.git
+agent-evidence-mcp init
+agent-evidence-mcp serve
+```
+
+如果你已经 clone 了这个仓库并想本地开发：
+
 ```bash
 pip install -e .
 agent-evidence-mcp init
@@ -68,6 +78,16 @@ This is the first alpha prerelease of Agent Evidence MCP. It is a local evidence
 - finish with `summary.md` and `timeline.jsonl`
 
 ### How To Start
+
+Install the current GitHub version:
+
+```bash
+pip install git+https://github.com/xiexie-qiuligao/agent-evidence-mcp.git
+agent-evidence-mcp init
+agent-evidence-mcp serve
+```
+
+If you are developing from a local clone:
 
 ```bash
 pip install -e .
